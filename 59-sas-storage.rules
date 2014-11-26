@@ -1,0 +1,21 @@
+# SAS by-path
+
+ACTION=="remove", GOTO="sas_storage_end"
+SUBSYSTEM!="block", GOTO="sas_storage_end"
+
+# skip rules for inappropriate block devices
+KERNEL=="fd*|mtd*|nbd*|gnbd*|btibm*|dm-*|md*|zram*", GOTO="sas_storage_end"
+
+# never access non-cdrom removable ide devices, the drivers are causing event loops on open()
+KERNEL=="hd*[!0-9]", ATTR{removable}=="1", SUBSYSTEMS=="ide", ATTRS{media}=="disk|floppy", GOTO="sas_storage_end"
+KERNEL=="hd*[0-9]", ATTRS{removable}=="1", GOTO="sas_storage_end"
+
+# ignore partitions that span the entire disk
+TEST=="whole_disk", GOTO="sas_storage_end"
+
+# skip unpartitioned removable media devices from drivers which do not send "change" events
+ENV{DEVTYPE}=="disk", KERNEL!="xvd*|sd*|sr*", ATTR{removable}=="1", GOTO="sas_storage_end"
+
+ENV{DEVTYPE}=="disk", DEVPATH!="*/virtual/*", IMPORT{program}="sas_path_id $devnode"
+
+LABEL="sas_storage_end"

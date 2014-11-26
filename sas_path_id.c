@@ -40,7 +40,6 @@ int main(int argc, char **argv)
 	const char *phy_id;
 	const char *exp_sas_addr = NULL;
 	char *lun = NULL;
-	char *old_symlink = NULL;
 	int r = 1;
 
 	if (argc < 2) {
@@ -55,20 +54,6 @@ int main(int argc, char **argv)
 	if (!udev) {
 		fprintf(stderr, "Can't create udev\n");
 		goto exit;
-	}
-
-	if (argc == 3) {
-		char *sas_str;
-
-		old_symlink = argv[2];
-
-		/* Get the last component of the old by-path symlink" */
-		sas_str = strstr(old_symlink, "sas-");
-		if (sas_str) {
-			/* truncate the last component of the old by-path link */
-			*sas_str = 0;
-		} else
-			old_symlink = NULL;
 	}
 
 	/* Get the last component of the device's path, i.e. /dev/sda1 ---> sda1 */
@@ -157,10 +142,8 @@ int main(int argc, char **argv)
 		goto exit;
 	}
 
-	printf("ID_SAS_PATH=");
+	printf("ID_PATH=");
 
-	if (old_symlink)
-		printf("%s", old_symlink);
 	if (exp_sas_addr)
 		printf("sas-exp%s-phy%s-%s\n", exp_sas_addr, phy_id, lun);
 	else

@@ -1,6 +1,0 @@
-# SAS by-path
-
-ENV{DEVTYPE}=="disk", DEVPATH!="*/virtual/*", IMPORT{program}="sas_path_id $devnode $env{ID_PATH}"
-ENV{DEVTYPE}=="disk", ENV{ID_SAS_PATH}=="?*", SYMLINK+="disk/by-path/$env{ID_SAS_PATH}"
-ENV{DEVTYPE}=="partition", ENV{ID_SAS_PATH}=="?*", SYMLINK+="disk/by-path/$env{ID_SAS_PATH}-part%n"
-
